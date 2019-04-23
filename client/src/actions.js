@@ -58,6 +58,19 @@ export function getAuthenticated() {
     }
 }
 
+export function getEmoji() {
+    return dispatch => {
+        axios.get("http://localhost:8080/emoji", {params: {fromToken: mychatToken}})
+            .then(t => {
+                console.debug(t)
+                dispatch({
+                    type: at.RECV_EMOJI,
+                    payload: t.data
+                })
+            })
+    }
+}
+
 export function setGithub(gh) {
     github = gh;
     console.debug(github);

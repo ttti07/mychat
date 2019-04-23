@@ -3,7 +3,7 @@ import {bindActionCreators} from "redux";
 import {connect} from 'react-redux';
 
 import Chat from '../components/Chat';
-import {sendText} from '../actions';
+import {getEmoji, sendText} from '../actions';
 
 class ChatContainer extends React.Component {
     handleSendText(e) {
@@ -17,10 +17,11 @@ class ChatContainer extends React.Component {
         const {profile} = this.props;
 
         if (profile) {
+            this.props.getEmoji();
             return <Chat name={profile.login} handleSendText={::this.handleSendText} />;
         }
         return null;
     }
 }
 
-export default connect(s => s.oauth, d => bindActionCreators({sendText}, d))(ChatContainer);
+export default connect(s => s.oauth, d => bindActionCreators({sendText, getEmoji}, d))(ChatContainer);

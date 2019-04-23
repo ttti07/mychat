@@ -1,3 +1,4 @@
+export var RECV_EMOJI = "RECV_EMOJI";
 export const SEND_TEXT = "SEND_TEXT";
 export const RECV_TEXT = "RECV_TEXT";
 export const RECV_ACCESS_TOKEN = "RECV_ACCESS_TOKEN";
