@@ -2,10 +2,7 @@ package com.github.godnsheeps.mychat.web.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.godnsheeps.mychat.MyChatServerApplication;
-import com.github.godnsheeps.mychat.domain.ChatRepository;
-import com.github.godnsheeps.mychat.domain.Message;
-import com.github.godnsheeps.mychat.domain.MessageRepository;
-import com.github.godnsheeps.mychat.domain.UserRepository;
+import com.github.godnsheeps.mychat.domain.*;
 import com.github.godnsheeps.mychat.util.Functions;
 import io.jsonwebtoken.Jwts;
 import lombok.Builder;
@@ -39,6 +36,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     private MessageRepository messageRepository;
     private ChatRepository chatRepository;
     private UserRepository userRepository;
+    private MentionRepository mentionRepository;
 
     @Autowired
     public ChatWebSocketHandler(ObjectMapper objectMapper,

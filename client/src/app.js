@@ -10,7 +10,7 @@ import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
 import reducer from './reducers';
 import OAuthGithubContainer from "./containers/OAuthGithubContainer";
-import Index from "./components";
+import Index from "./components/Index";
 
 const store = createStore(reducer, applyMiddleware(thunk));
 ReactDOM.render(
