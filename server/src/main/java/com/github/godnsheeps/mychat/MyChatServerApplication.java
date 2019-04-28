@@ -47,7 +47,6 @@ public class MyChatServerApplication implements CommandLineRunner {
                 .GET("/oauth/github/access-token", openAuthHandler::getAccessTokenForGithub)
                 .GET("/mentions", mentionHandler::getMention)
                 .PUT("/mentions", mentionHandler::readMention)
-                .POST("/mentions", mentionHandler::createMention)
                 .build();
     }
 

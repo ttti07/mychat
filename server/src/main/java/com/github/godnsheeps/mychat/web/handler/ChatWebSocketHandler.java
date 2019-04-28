@@ -2,10 +2,7 @@ package com.github.godnsheeps.mychat.web.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.godnsheeps.mychat.MyChatServerApplication;
-import com.github.godnsheeps.mychat.domain.ChatRepository;
-import com.github.godnsheeps.mychat.domain.Message;
-import com.github.godnsheeps.mychat.domain.MessageRepository;
-import com.github.godnsheeps.mychat.domain.UserRepository;
+import com.github.godnsheeps.mychat.domain.*;
 import com.github.godnsheeps.mychat.util.Functions;
 import io.jsonwebtoken.Jwts;
 import lombok.Builder;
@@ -22,6 +19,7 @@ import reactor.util.Loggers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * ChatWebSocketHandler
@@ -39,6 +37,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     private MessageRepository messageRepository;
     private ChatRepository chatRepository;
     private UserRepository userRepository;
+    private Pattern mentionPattern;
 
     @Autowired
     public ChatWebSocketHandler(ObjectMapper objectMapper,
@@ -49,6 +48,12 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
+
+        this.mentionPattern = Pattern.compile(
+                userRepository.findAll().flatMap(user -> Mono.just(user.getName()))
+                        .sort((a, b) -> a.length() - b.length())
+                        .reduce("@(?:", (x, y) -> x + y + "|").block() + ")");
+        log.trace("mentionPattern: {}", mentionPattern.pattern());
     }
 
     @Override
@@ -81,11 +86,27 @@ public class ChatWebSocketHandler implements WebSocketHandler {
                         })
                         .flatMap(t -> {
                             var message = t.getT3().message;
+
+                            var matcher = mentionPattern.matcher(message);
+                            var i = 0;
+                            var msgToks = new ArrayList<MessageToken>();
+                            while (matcher.find()) {
+                                if (i < matcher.start()) {
+                                    msgToks.add(MessageToken.builder().text(message.substring(i, matcher.start())).build());
+                                }
+                                msgToks.add(MentionToken.builder().target(t.getT1()).text(matcher.group()).build());
+                                i = matcher.end();
+                            }
+                            if (i < message.length())
+                                msgToks.add(MessageToken.builder().text(message.substring(i, message.length())).build());
+                            log.trace("msgToks: {}", msgToks);
+
                             return Mono.zip(Mono.just(message),
                                     messageRepository.save(Message.builder()
                                             .chat(t.getT2())
                                             .from(t.getT1())
                                             .text(message)
+                                            .messageTokens(msgToks)
                                             .build()));
                         })
                         .map(t -> ResponsePayload.builder()

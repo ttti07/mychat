@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 /**
  * @author jcooky
  */
@@ -20,7 +22,10 @@ public class Message {
     private User from;
 
     private String text;
+
+    @Builder.Default
     private Long timestamp = System.currentTimeMillis();
+    private List<MessageToken> messageTokens;
 
     @DBRef
     private Chat chat;

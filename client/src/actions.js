@@ -81,7 +81,7 @@ export function clickMention(messageId, mentionId) {
 
 export function readMention(messageId, mentionId) {
     return dispatch => {
-        axios.put("http://localhost:8080/mentions", {token: mychatToken, mentionId})
+        axios.put("http://localhost:8080/mentions", {token: mychatToken, messageId})
             .then(result => {
                 dispatch({
                     type: at.READ_MENTION,
